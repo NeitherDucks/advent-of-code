@@ -1,2 +1,2 @@
 pub mod part1;
-pub mode part2;
+pub mod part2;
