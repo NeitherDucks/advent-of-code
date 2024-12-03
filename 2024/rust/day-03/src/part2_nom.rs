@@ -12,21 +12,13 @@ use nom::{
 pub fn process(input: &str) -> miette::Result<String> {
     let (_, instructions) = parse(input).map_err(|e| miette!("parse failed {}", e))?;
 
-    let mut can_do = true;
-
-    let result = instructions.iter().fold(0, |acc, ins| {
-        acc + match ins {
-            Instruction::Mul(l, r) => l * r * can_do as u32,
-            Instruction::Do => {
-                can_do = true;
-                0
-            }
-            Instruction::Dont => {
-                can_do = false;
-                0
-            }
-        }
-    });
+    let (_, result) = instructions
+        .iter()
+        .fold((true, 0), |(can_do, acc), ins| match ins {
+            Instruction::Mul(l, r) => (can_do, acc + l * r * can_do as u32),
+            Instruction::Do => (true, acc),
+            Instruction::Dont => (false, acc),
+        });
 
     Ok(result.to_string())
 }
